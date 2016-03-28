@@ -5,22 +5,22 @@ import (
 	"github.com/pariz/gountries"
 )
 
-func removeCountry(countries []gountries.Country, index int) []gountries.Country {
-	lastIndex := len(countries) - 1
-	countries[index] = countries[lastIndex]
-	return countries[:lastIndex]
-}
-
-func countriesToAnswers(countries []gountries.Country) (answers []Answer) {
+func goodAnswersToArray(countries []gountries.Country) (answers []Answer) {
 	for _, country := range countries {
-		answers = append(answers, Answer{CountryName: country.Name.Common, Correct: true})
+		answers = append(answers, Answer{
+			CountryCode: country.Codes.Alpha3,
+			CountryName: country.Name.Common,
+			Correct: true})
 	}
 	return
 }
 
-func namesMapToAnswersArray(countryNamesMap map[string]bool) (answers []Answer) {
-	for countryName := range countryNamesMap {
-		answers = append(answers, Answer{CountryName: countryName, Correct: false})
+func badAnswersMapToArray(countryNamesMap map[string]gountries.Country) (answers []Answer) {
+	for _, country := range countryNamesMap {
+		answers = append(answers, Answer{
+			CountryCode: country.Codes.Alpha3,
+			CountryName: country.Name.Common,
+			Correct: false})
 	}
 	return
 }

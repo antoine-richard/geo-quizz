@@ -14,11 +14,13 @@ var countriesByBorders = tidyCountriesByBorders()
 
 type Question struct {
 	Statement string
+	CountryCode string
 	CountryName string
 	Answers []Answer
 }
 
 type Answer struct {
+	CountryCode string
 	CountryName string
 	Correct bool
 }
@@ -43,7 +45,7 @@ func getQuestion(numberOfBorders int, totalNumberOfAnswers int) Question {
 
 	for ok := true; ok; ok = (answersError != nil) {
 		//questionCountry, _ := query.FindCountryByAlpha("NIC")
-		questionCountry, countryError = pickACountry(countriesByBorders, numberOfBorders)
+		questionCountry, countryError = pickACountry(numberOfBorders)
 		if countryError != nil {
 			log.Fatal(countryError)
 		}
@@ -55,11 +57,11 @@ func getQuestion(numberOfBorders int, totalNumberOfAnswers int) Question {
 	}
 
 	statement := fmt.Sprintf("Pick %v's %v bordering countries", questionCountry.Name.Common, numberOfBorders)
-	return Question{statement, questionCountry.Name.Common, answers}
+	return Question{statement, questionCountry.Codes.Alpha3, questionCountry.Name.Common, answers}
 }
 
 // TODO: write a test
-func pickACountry(countriesByBorders map[int][]gountries.Country, numberOfBorders int) (gountries.Country, error) {
+func pickACountry(numberOfBorders int) (gountries.Country, error) {
 	countries := countriesByBorders[numberOfBorders]
 
 	if len(countries) == 0 {
@@ -67,12 +69,9 @@ func pickACountry(countriesByBorders map[int][]gountries.Country, numberOfBorder
 		return gountries.Country{}, errors.New(message)
 	}
 
-	index := rand.Intn(len(countries))
-	country := countries[index]
+	country := countries[rand.Intn(len(countries))]
 
-	// TODO: extract this action in the game file?
-	// removing the picked country from the list of questions
-	countriesByBorders[numberOfBorders] = removeCountry(countries, index)
+	removeCountryFromList(numberOfBorders, country)
 
 	return country, nil
 }
@@ -80,23 +79,23 @@ func pickACountry(countriesByBorders map[int][]gountries.Country, numberOfBorder
 func computeAnswers(questionCountry gountries.Country, totalNumberOfAnswers int) ([]Answer, error) {
 	correctBorderingCountries := questionCountry.BorderingCountries()
 
-	badAnswersMap := make(map[string]bool)
+	badAnswersMap := make(map[string]gountries.Country)
 	// adding bad answers
 	for _, country := range correctBorderingCountries {
 		for _, answersNeighbor := range country.BorderingCountries() {
 			if (answersNeighbor.Codes.Alpha3 != questionCountry.Codes.Alpha3)  {
-				badAnswersMap[answersNeighbor.Name.Common] = false
+				badAnswersMap[answersNeighbor.Codes.Alpha3] = answersNeighbor
 			}
 		}
 	}
 	// removing correct answers if present
 	for _, country := range correctBorderingCountries {
-		delete(badAnswersMap, country.Name.Common)
+		delete(badAnswersMap, country.Codes.Alpha3)
 	}
 
 	// to arrays of Answer
-	correctAnswers := countriesToAnswers(correctBorderingCountries)
-	badAnswers := namesMapToAnswersArray(badAnswersMap)
+	correctAnswers := goodAnswersToArray(correctBorderingCountries)
+	badAnswers := badAnswersMapToArray(badAnswersMap)
 
 	if len(correctAnswers) + len(badAnswers) < totalNumberOfAnswers {
 		message := fmt.Sprintf("Not enough bad answers for bordering countries of %v (found %v, wanted %v)",
@@ -119,4 +118,19 @@ func limitAndShuffleAnswers(correctAnswers []Answer, badAnswers []Answer, totalN
 	}
 
 	return shuffle(answers)
+}
+
+func removeCountryFromList(numberOfBorders int, countryToRemove gountries.Country) {
+	countries := countriesByBorders[numberOfBorders]
+
+	i := 0
+	for _, country := range countries {
+		if country.Codes.Alpha3 != countryToRemove.Codes.Alpha3 {
+			countries[i] = country
+			i++
+		}
+	}
+	countries = countries[:i] // TODO: learn what it is
+
+	countriesByBorders[numberOfBorders] = countries
 }
