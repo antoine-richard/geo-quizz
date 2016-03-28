@@ -1,4 +1,4 @@
-package geoquizz
+package geoquiz
 
 
 var numberOfBorders = 2

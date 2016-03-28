@@ -1,4 +1,4 @@
-package geoquizz
+package geoquiz
 
 import (
 	"github.com/pariz/gountries"

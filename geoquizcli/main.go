@@ -2,17 +2,17 @@ package main
 
 import (
 	"fmt"
-	"github.com/antoine-richard/geo-quizz/geoquizz"
 	"bufio"
 	"os"
 	"strings"
+	"github.com/antoine-richard/geoquiz/geoquiz"
 )
 
 func main() {
 	reader := bufio.NewReader(os.Stdin)
 
 	for {
-		question := geoquizz.NextQuestion()
+		question := geoquiz.NextQuestion()
 		display(question)
 
 		fmt.Println("\nPress enter to see another question, type exit to quit")
@@ -26,7 +26,7 @@ func main() {
 	}
 }
 
-func display(question geoquizz.Question) {
+func display(question geoquiz.Question) {
 	fmt.Print(question.Statement)
 	fmt.Println(":\n")
 
