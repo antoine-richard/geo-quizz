@@ -93,9 +93,9 @@ func computeAnswers(questionCountry gountries.Country, totalNumberOfAnswers int)
 		delete(badAnswersMap, country.Codes.Alpha3)
 	}
 
-	// to arrays of Answer
-	correctAnswers := goodAnswersToArray(correctBorderingCountries)
-	badAnswers := badAnswersMapToArray(badAnswersMap)
+	// converting countries to answers
+	correctAnswers := toAnswers(correctBorderingCountries, true)
+	badAnswers := toAnswers(values(badAnswersMap), false)
 
 	if len(correctAnswers) + len(badAnswers) < totalNumberOfAnswers {
 		message := fmt.Sprintf("Not enough bad answers for bordering countries of %v (found %v, wanted %v)",
