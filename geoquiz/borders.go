@@ -61,7 +61,7 @@ func getQuestion(numberOfBorders int, totalNumberOfAnswers int) Question {
 }
 
 // TODO: write a test
-func pickACountry(numberOfBorders int) (country gountries.Country, error) {
+func pickACountry(numberOfBorders int) (country gountries.Country, err error) {
 	countries := countriesByBorders[numberOfBorders]
 
 	if len(countries) == 0 {
