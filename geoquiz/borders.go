@@ -61,7 +61,7 @@ func getQuestion(numberOfBorders int, totalNumberOfAnswers int) Question {
 }
 
 // TODO: write a test
-func pickACountry(numberOfBorders int) (gountries.Country, error) {
+func pickACountry(numberOfBorders int) (country gountries.Country, error) {
 	countries := countriesByBorders[numberOfBorders]
 
 	if len(countries) == 0 {
@@ -69,9 +69,9 @@ func pickACountry(numberOfBorders int) (gountries.Country, error) {
 		return gountries.Country{}, errors.New(message)
 	}
 
-	country := countries[rand.Intn(len(countries))]
+	country = countries[rand.Intn(len(countries))]
 
-	removeCountryFromList(numberOfBorders, country)
+	removeFromList(country, countriesByBorders[numberOfBorders])
 
 	return country, nil
 }
@@ -108,7 +108,6 @@ func computeAnswers(questionCountry gountries.Country, totalNumberOfAnswers int)
 
 func limitAndShuffleAnswers(correctAnswers []Answer, badAnswers []Answer, totalNumberOfAnswers int) (answers []Answer) {
 	answers = correctAnswers
-
 	badAnswers = shuffle(badAnswers)
 
 	i := 0
@@ -120,9 +119,7 @@ func limitAndShuffleAnswers(correctAnswers []Answer, badAnswers []Answer, totalN
 	return shuffle(answers)
 }
 
-func removeCountryFromList(numberOfBorders int, countryToRemove gountries.Country) {
-	countries := countriesByBorders[numberOfBorders]
-
+func removeFromList(countryToRemove gountries.Country, countries []gountries.Country) {
 	i := 0
 	for _, country := range countries {
 		if country.Codes.Alpha3 != countryToRemove.Codes.Alpha3 {
@@ -130,7 +127,5 @@ func removeCountryFromList(numberOfBorders int, countryToRemove gountries.Countr
 			i++
 		}
 	}
-	countries = countries[:i] // TODO: learn what it is
-
-	countriesByBorders[numberOfBorders] = countries
+	countriesByBorders[numberOfBorders] = countries[:i]
 }
