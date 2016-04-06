@@ -5,7 +5,7 @@ import (
 	"bufio"
 	"os"
 	"strings"
-	"github.com/antoine-richard/geoquiz/geoquiz"
+	"github.com/antoine-richard/geoquiz"
 )
 
 func main() {
