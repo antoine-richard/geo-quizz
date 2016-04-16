@@ -12,19 +12,6 @@ import (
 var query = gountries.New()
 var countriesByBorders = tidyCountriesByBorders()
 
-type Question struct {
-	Statement string
-	CountryCode string
-	CountryName string
-	Answers []Answer
-}
-
-type Answer struct {
-	CountryCode string
-	CountryName string
-	Correct bool
-}
-
 func init() {
 	rand.Seed(time.Now().UTC().UnixNano())
 }
@@ -38,7 +25,7 @@ func tidyCountriesByBorders() (countriesByBorders map[int][]gountries.Country) {
 	return
 }
 
-func getQuestion(numberOfBorders int, totalNumberOfAnswers int) Question {
+func getBorderingCountriesQuestion(numberOfBorders int, totalNumberOfAnswers int) Question {
 	var questionCountry gountries.Country
 	var answers []Answer
 	var answersError, countryError error
@@ -56,8 +43,14 @@ func getQuestion(numberOfBorders int, totalNumberOfAnswers int) Question {
 		}
 	}
 
-	statement := fmt.Sprintf("Pick %v's %v bordering countries", questionCountry.Name.Common, numberOfBorders)
-	return Question{statement, questionCountry.Codes.Alpha3, questionCountry.Name.Common, answers}
+	statement := fmt.Sprintf("What are %v's %v bordering countries", questionCountry.Name.Common, numberOfBorders)
+	return Question{
+		statement,
+		numberOfBorders,
+		questionCountry.Codes.Alpha3,
+		questionCountry.Name.Common,
+		answers,
+	}
 }
 
 func pickACountry(numberOfBorders int) (country gountries.Country, err error) {
